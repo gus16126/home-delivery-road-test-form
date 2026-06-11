@@ -86,37 +86,9 @@
 
         .grid-inputs {
             display: grid;
-            grid-template-columns: 60px 2fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 12px;
             margin-bottom: 12px;
-            align-items: end;
-        }
-
-        .driver-name-group {
-            grid-column: 2;
-            grid-row: 1;
-        }
-
-        .employee-id-group {
-            grid-column: 3;
-            grid-row: 1;
-        }
-
-        .date-label-front {
-            grid-column: 1;
-            grid-row: 2;
-            font-weight: 600;
-            font-size: 11px;
-            color: var(--secondary-text);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
-            white-space: nowrap;
-        }
-
-        .date-input-field {
-            grid-column: 2;
-            grid-row: 2;
         }
 
         .input-group {
@@ -133,20 +105,7 @@
             letter-spacing: 0.5px;
         }
 
-        .date-input-field, .input-group input {
-            padding: 6px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 15px;
-            background: var(--bg-color);
-            color: var(--text-color);
-            font-family: inherit;
-            height: 34px;
-            box-sizing: border-box;
-            transition: border-color var(--transition-speed);
-        }
-
-        .input-group textarea {
+        .input-group input, .input-group textarea {
             padding: 10px 12px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -154,10 +113,14 @@
             background: var(--bg-color);
             color: var(--text-color);
             font-family: inherit;
-            height: auto;
-            resize: vertical;
+            height: 40px;
             box-sizing: border-box;
             transition: border-color var(--transition-speed);
+        }
+
+        .input-group textarea {
+            height: auto;
+            resize: vertical;
         }
 
         .input-group input:focus, .input-group textarea:focus {
@@ -597,23 +560,18 @@
     <div class="instructions">Use the Yes / No toggle for each item. All items must have a 'Yes' rating for the driver to pass the road test.</div>
     
     <div class="grid-inputs">
-        <!-- Driver's Name (Original vertical style: label on top) -->
-        <div class="input-group driver-name-group">
+        <div class="input-group">
             <label for="driverName">Driver's Name</label>
             <input type="text" id="driverName" placeholder="Driver Name">
         </div>
-        
-        <!-- Employee ID# (Original vertical style: label on top) -->
-        <div class="input-group employee-id-group">
+        <div class="input-group">
             <label for="employeeId">Employee ID#</label>
             <input type="text" id="employeeId" placeholder="Employee ID">
         </div>
-        
-        <!-- Date Label (Horizontal style: label in front) -->
-        <label for="testDate" class="date-label-front">Date:</label>
-        
-        <!-- Date Input Field (Placed in Column 2, matching Driver Name width exactly) -->
-        <input type="date" id="testDate" class="date-input-field">
+        <div class="input-group">
+            <label for="testDate">Date</label>
+            <input type="date" id="testDate">
+        </div>
     </div>
     
     <div class="progress-container">
@@ -1620,7 +1578,7 @@
 
     // Service Worker Registration
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js?v=10')
+        navigator.serviceWorker.register('./sw.js?v=11')
             .then(() => console.log('Service Worker Registered'))
             .catch((err) => console.log('Service Worker Failed to Register', err));
             
