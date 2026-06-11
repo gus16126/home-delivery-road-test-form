@@ -91,6 +91,20 @@
             margin-bottom: 12px;
         }
 
+        .input-row {
+            display: flex;
+            gap: 12px;
+            grid-column: 1 / -1;
+        }
+
+        .flex-2 {
+            flex: 2;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
         .input-group {
             display: flex;
             flex-direction: column;
@@ -560,13 +574,15 @@
     <div class="instructions">Use the Yes / No toggle for each item. All items must have a 'Yes' rating for the driver to pass the road test.</div>
     
     <div class="grid-inputs">
-        <div class="input-group">
-            <label for="driverName">Driver's Name</label>
-            <input type="text" id="driverName" placeholder="Driver Name">
-        </div>
-        <div class="input-group">
-            <label for="employeeId">Employee ID#</label>
-            <input type="text" id="employeeId" placeholder="Employee ID">
+        <div class="input-row">
+            <div class="input-group flex-2">
+                <label for="driverName">Driver's Name</label>
+                <input type="text" id="driverName" placeholder="Driver Name">
+            </div>
+            <div class="input-group flex-1">
+                <label for="employeeId">Employee ID#</label>
+                <input type="text" id="employeeId" placeholder="Employee ID">
+            </div>
         </div>
         <div class="input-group">
             <label for="testDate">Date</label>
