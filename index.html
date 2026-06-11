@@ -132,9 +132,11 @@
             background: var(--bg-color);
             color: var(--text-color);
             font-family: inherit;
-            height: 42px;
+            height: 40px;
             box-sizing: border-box;
             transition: border-color var(--transition-speed);
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .date-horizontal-group input:focus {
@@ -1639,7 +1641,7 @@
 
     // Service Worker Registration
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js?v=14')
+        navigator.serviceWorker.register('./sw.js?v=15')
             .then(() => console.log('Service Worker Registered'))
             .catch((err) => console.log('Service Worker Failed to Register', err));
             
