@@ -86,44 +86,54 @@
 
         .grid-inputs {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 60px 2fr 1fr;
             gap: 12px;
             margin-bottom: 12px;
+            align-items: end;
         }
 
         .driver-name-group {
-            grid-column: 1;
-            grid-row: 1;
-        }
-
-        .employee-id-group {
             grid-column: 2;
             grid-row: 1;
         }
 
-        .test-date-group {
+        .employee-id-group {
+            grid-column: 3;
+            grid-row: 1;
+        }
+
+        .date-label-front {
             grid-column: 1;
             grid-row: 2;
-        }
-
-        .input-group-horizontal {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .input-group-horizontal label {
             font-weight: 600;
             font-size: 11px;
             color: var(--secondary-text);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            width: 100px;
-            flex-shrink: 0;
+            margin-bottom: 10px;
             white-space: nowrap;
         }
 
-        .input-group-horizontal input, .input-group input {
+        .date-input-field {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            font-size: 11px;
+            margin-bottom: 4px;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .date-input-field, .input-group input {
             padding: 6px 12px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -587,18 +597,23 @@
     <div class="instructions">Use the Yes / No toggle for each item. All items must have a 'Yes' rating for the driver to pass the road test.</div>
     
     <div class="grid-inputs">
-        <div class="input-group-horizontal driver-name-group">
+        <!-- Driver's Name (Original vertical style: label on top) -->
+        <div class="input-group driver-name-group">
             <label for="driverName">Driver's Name</label>
             <input type="text" id="driverName" placeholder="Driver Name">
         </div>
-        <div class="input-group-horizontal employee-id-group">
+        
+        <!-- Employee ID# (Original vertical style: label on top) -->
+        <div class="input-group employee-id-group">
             <label for="employeeId">Employee ID#</label>
             <input type="text" id="employeeId" placeholder="Employee ID">
         </div>
-        <div class="input-group-horizontal test-date-group">
-            <label for="testDate">Date</label>
-            <input type="date" id="testDate">
-        </div>
+        
+        <!-- Date Label (Horizontal style: label in front) -->
+        <label for="testDate" class="date-label-front">Date:</label>
+        
+        <!-- Date Input Field (Placed in Column 2, matching Driver Name width exactly) -->
+        <input type="date" id="testDate" class="date-input-field">
     </div>
     
     <div class="progress-container">
@@ -1605,7 +1620,7 @@
 
     // Service Worker Registration
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js?v=9')
+        navigator.serviceWorker.register('./sw.js?v=10')
             .then(() => console.log('Service Worker Registered'))
             .catch((err) => console.log('Service Worker Failed to Register', err));
             

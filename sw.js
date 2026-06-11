@@ -1,4 +1,4 @@
-const CACHE_NAME = 'road-test-cache-v9';
+const CACHE_NAME = 'road-test-cache-v10';
 const ASSETS = [
   './',
   './index.html',
