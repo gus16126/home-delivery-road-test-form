@@ -105,10 +105,6 @@
             flex: 1;
         }
 
-        #testDate {
-            max-width: 150px;
-        }
-
         .input-group {
             display: flex;
             flex-direction: column;
@@ -123,7 +119,20 @@
             letter-spacing: 0.5px;
         }
 
-        .input-group input, .input-group textarea {
+        .input-group input {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: inherit;
+            height: 34px;
+            box-sizing: border-box;
+            transition: border-color var(--transition-speed);
+        }
+
+        .input-group textarea {
             padding: 10px 12px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -131,14 +140,10 @@
             background: var(--bg-color);
             color: var(--text-color);
             font-family: inherit;
-            height: 40px;
-            box-sizing: border-box;
-            transition: border-color var(--transition-speed);
-        }
-
-        .input-group textarea {
             height: auto;
             resize: vertical;
+            box-sizing: border-box;
+            transition: border-color var(--transition-speed);
         }
 
         .input-group input:focus, .input-group textarea:focus {
@@ -1598,7 +1603,7 @@
 
     // Service Worker Registration
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js?v=5')
+        navigator.serviceWorker.register('./sw.js?v=6')
             .then(() => console.log('Service Worker Registered'))
             .catch((err) => console.log('Service Worker Failed to Register', err));
             
