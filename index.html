@@ -86,23 +86,21 @@
 
         .grid-inputs {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: 2fr 1fr;
             gap: 12px;
             margin-bottom: 12px;
         }
 
-        .input-row {
-            display: flex;
-            gap: 12px;
-            grid-column: 1 / -1;
+        .driver-name-group {
+            grid-column: 1;
         }
 
-        .flex-2 {
-            flex: 2;
+        .employee-id-group {
+            grid-column: 2;
         }
 
-        .flex-1 {
-            flex: 1;
+        .test-date-group {
+            grid-column: 2;
         }
 
         .input-group {
@@ -583,19 +581,17 @@
     <div class="instructions">Use the Yes / No toggle for each item. All items must have a 'Yes' rating for the driver to pass the road test.</div>
     
     <div class="grid-inputs">
-        <div class="input-row">
-            <div class="input-group flex-2">
-                <label for="driverName">Driver's Name</label>
-                <input type="text" id="driverName" placeholder="Driver Name">
-            </div>
-            <div class="input-group flex-1">
-                <label for="employeeId">Employee ID#</label>
-                <input type="text" id="employeeId" placeholder="Employee ID">
-            </div>
-            <div class="input-group flex-1">
-                <label for="testDate">Date</label>
-                <input type="date" id="testDate">
-            </div>
+        <div class="input-group driver-name-group">
+            <label for="driverName">Driver's Name</label>
+            <input type="text" id="driverName" placeholder="Driver Name">
+        </div>
+        <div class="input-group employee-id-group">
+            <label for="employeeId">Employee ID#</label>
+            <input type="text" id="employeeId" placeholder="Employee ID">
+        </div>
+        <div class="input-group test-date-group">
+            <label for="testDate">Date</label>
+            <input type="date" id="testDate">
         </div>
     </div>
     
@@ -1603,7 +1599,7 @@
 
     // Service Worker Registration
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js?v=7')
+        navigator.serviceWorker.register('./sw.js?v=8')
             .then(() => console.log('Service Worker Registered'))
             .catch((err) => console.log('Service Worker Failed to Register', err));
             
