@@ -1,4 +1,4 @@
-const CACHE_NAME = 'road-test-cache-v2';
+const CACHE_NAME = 'road-test-cache-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -32,22 +32,27 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Fetch Event - Cache First with Network Fallback
+// Fetch Event - Network First with Cache Fallback
 self.addEventListener('fetch', (e) => {
+  if (e.request.method !== 'GET') return;
+
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
+    fetch(e.request).then((networkResponse) => {
+      // If network returns a valid file, update the cache and serve it
+      if (networkResponse.status === 200) {
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(e.request, networkResponse.clone());
+          return networkResponse;
+        });
       }
-      return fetch(e.request).then((networkResponse) => {
-        if (e.request.method === 'GET' && networkResponse.status === 200) {
-          return caches.open(CACHE_NAME).then((cache) => {
-            cache.put(e.request, networkResponse.clone());
-            return networkResponse;
-          });
+      return networkResponse;
+    }).catch(() => {
+      // If offline/network fails, load from local cache
+      return caches.match(e.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
         }
-        return networkResponse;
-      }).catch(() => {
+        // Fallback for HTML page requests if completely uncached
         if (e.request.headers.get('accept') && e.request.headers.get('accept').includes('text/html')) {
           return caches.match('./index.html');
         }

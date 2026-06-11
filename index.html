@@ -1597,6 +1597,15 @@
         navigator.serviceWorker.register('./sw.js')
             .then(() => console.log('Service Worker Registered'))
             .catch((err) => console.log('Service Worker Failed to Register', err));
+            
+        // Automatically reload the page when a new service worker takes over control
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+                refreshing = true;
+                window.location.reload();
+            }
+        });
     }
 </script>
 </body>
