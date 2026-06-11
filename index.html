@@ -125,6 +125,22 @@
         .date-horizontal-group input {
             flex: 1;
             width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: inherit;
+            height: 44px;
+            box-sizing: border-box;
+            transition: border-color var(--transition-speed);
+        }
+
+        .date-horizontal-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--card-bg);
         }
 
         .input-group {
@@ -1623,7 +1639,7 @@
 
     // Service Worker Registration
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js?v=12')
+        navigator.serviceWorker.register('./sw.js?v=13')
             .then(() => console.log('Service Worker Registered'))
             .catch((err) => console.log('Service Worker Failed to Register', err));
             
