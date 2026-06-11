@@ -1,0 +1,17 @@
+{
+  "name": "Home Delivery Road Test Form",
+  "short_name": "Road Test",
+  "description": "Commercial motor vehicle road test form for Home Delivery and Rollback drivers.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f2f2f7",
+  "theme_color": "#007aff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

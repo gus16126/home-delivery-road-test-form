@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no">
+    <title>Home Delivery / Rollback Road Test</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #007aff;
+            --primary-dark: #0056b3;
+            --bg-color: #f2f2f7;
+            --card-bg: #ffffff;
+            --text-color: #1c1c1e;
+            --secondary-text: #8e8e93;
+            --border-color: #d1d1d6;
+            --success-color: #34c759;
+            --danger-color: #ff3b30;
+            --font-family-body: 'Inter', -apple-system, sans-serif;
+            --font-family-heading: 'Outfit', -apple-system, sans-serif;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --transition-speed: 0.2s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121214;
+                --card-bg: #1c1c1e;
+                --text-color: #f2f2f7;
+                --secondary-text: #a2a2a7;
+                --border-color: #2c2c2e;
+                --primary: #0a84ff;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-family-body);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 100px;
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        h1 {
+            font-family: var(--font-family-heading);
+            font-size: 22px;
+            margin: 0 0 6px 0;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .instructions {
+            font-size: 13px;
+            color: var(--secondary-text);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            font-size: 11px;
+            margin-bottom: 4px;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input, .input-group textarea {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: inherit;
+            height: 40px;
+            box-sizing: border-box;
+            transition: border-color var(--transition-speed);
+        }
+
+        .input-group textarea {
+            height: auto;
+            resize: vertical;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--card-bg);
+        }
+
+        .container {
+            padding: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Progress Tracker */
+        .progress-container {
+            height: 8px;
+            background: var(--border-color);
+            margin-top: 12px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success-color));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 12px;
+            color: var(--secondary-text);
+            margin-top: 5px;
+            font-weight: 600;
+        }
+
+        /* CSS Accordion */
+        .step-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .step-toggle {
+            display: none;
+        }
+
+        .step-header {
+            padding: 16px 20px;
+            background: var(--card-bg);
+            border-bottom: 1px solid transparent;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 17px;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background-color var(--transition-speed);
+        }
+
+        .step-header::after {
+            content: '+';
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .step-toggle:checked ~ .step-content {
+            display: block;
+        }
+
+        .step-toggle:checked ~ .step-header {
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .step-toggle:checked ~ .step-header::after {
+            transform: rotate(45deg);
+        }
+
+        .step-content {
+            display: none;
+            padding: 10px 20px 20px 20px;
+        }
+
+        /* Checklist Row & Segmented Control */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            gap: 15px;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-label {
+            font-size: 15px;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .segmented-control {
+            display: flex;
+            background: var(--bg-color);
+            padding: 2px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            width: 120px;
+            height: 34px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .seg-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--secondary-text);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .seg-btn.active-yes {
+            background-color: var(--success-color);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .seg-btn.active-no {
+            background-color: var(--danger-color);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Remarks Section & Info Signoff Card */
+        .info-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .info-card h2 {
+            font-family: var(--font-family-heading);
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .cert-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-color);
+            background: var(--bg-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Canvas Signature Area */
+        .signature-area {
+            margin-top: 15px;
+        }
+
+        .canvas-container {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            position: relative;
+            height: 150px;
+            width: 100%;
+        }
+
+        .signature-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        .canvas-clear-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Sticky Footer Controls */
+        .footer-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            padding: 12px 15px;
+            padding-left: calc(15px + env(safe-area-inset-left));
+            padding-right: calc(15px + env(safe-area-inset-right));
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            z-index: 200;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .btn:active {
+            opacity: 0.85;
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        /* Modal Overlays */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-family: var(--font-family-heading);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .modal-message {
+            font-size: 14px;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .history-list {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .history-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .history-meta {
+            color: var(--secondary-text);
+            font-size: 11px;
+        }
+
+        .restore-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .history-empty {
+            padding: 20px;
+            text-align: center;
+            color: var(--secondary-text);
+            font-size: 14px;
+        }
+
+        /* Print Media CSS Rules */
+        @media print {
+            body {
+                background-color: white;
+                color: black;
+                padding-bottom: 0;
+            }
+
+            header, .footer-actions, .step-header::after, .canvas-clear-btn, .btn, .step-toggle {
+                display: none !important;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .step-card, .info-card {
+                box-shadow: none;
+                border: 1px solid #000000;
+                margin-bottom: 15px;
+                border-radius: 4px;
+                page-break-inside: avoid;
+            }
+
+            .step-header {
+                background-color: #f2f2f7 !important;
+                color: black !important;
+                border-bottom: 1px solid black !important;
+                padding: 8px 12px;
+            }
+
+            .step-content {
+                display: block !important;
+                padding: 10px;
+            }
+
+            .checklist-item {
+                border-bottom: 1px solid #e5e5ea;
+                padding: 6px 0;
+            }
+
+            .segmented-control {
+                border: 1px solid black;
+            }
+
+            .seg-btn {
+                font-size: 11px;
+                padding: 2px;
+            }
+
+            .seg-btn.active-yes {
+                background-color: #34c759 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .seg-btn.active-no {
+                background-color: #ff3b30 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .canvas-container {
+                border: 1px solid black;
+            }
+
+            .cert-text {
+                border-left: 2px solid black;
+                background: #f2f2f7;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Home Delivery Road Test</h1>
+    <div class="instructions">Use the Yes / No toggle for each item. All items must have a 'Yes' rating for the driver to pass the road test.</div>
+    
+    <div class="grid-inputs">
+        <div class="input-group">
+            <label for="driverName">Driver's Name</label>
+            <input type="text" id="driverName" placeholder="Driver Name">
+        </div>
+        <div class="input-group">
+            <label for="employeeId">Employee ID#</label>
+            <input type="text" id="employeeId" placeholder="Employee ID">
+        </div>
+        <div class="input-group">
+            <label for="testDate">Date</label>
+            <input type="date" id="testDate">
+        </div>
+    </div>
+    
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">0 / 63 completed (0%)</div>
+</header>
+
+<div class="container">
+
+    <!-- Section 1 -->
+    <div class="step-card">
+        <input type="checkbox" id="toggle-s1" class="step-toggle" checked>
+        <label class="step-header" for="toggle-s1">1. Coupling and Uncoupling</label>
+        <div class="step-content">
+            <div class="checklist-item">
+                <span class="item-label">Is coupling available</span>
+                <div class="segmented-control" data-item="s1-1">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s1-1', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s1-1', 'no')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="step-card">
+        <input type="checkbox" id="toggle-s2" class="step-toggle">
+        <label class="step-header" for="toggle-s2">2. Before Moving Vehicle</label>
+        <div class="step-content">
+            <div class="checklist-item">
+                <span class="item-label">Proper operation of ELD</span>
+                <div class="segmented-control" data-item="s2-1">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s2-1', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s2-1', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">ELD mounted and clearly visible</span>
+                <div class="segmented-control" data-item="s2-2">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s2-2', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s2-2', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Pre-Trip completed</span>
+                <div class="segmented-control" data-item="s2-3">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s2-3', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s2-3', 'no')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="step-card">
+        <input type="checkbox" id="toggle-s3" class="step-toggle">
+        <label class="step-header" for="toggle-s3">3. Emergency Equipment</label>
+        <div class="step-content">
+            <div class="checklist-item">
+                <span class="item-label">Fire extinguisher</span>
+                <div class="segmented-control" data-item="s3-1">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s3-1', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s3-1', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Spare fuses</span>
+                <div class="segmented-control" data-item="s3-2">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s3-2', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s3-2', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Triangle or warning devices</span>
+                <div class="segmented-control" data-item="s3-3">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s3-3', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s3-3', 'no')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 4 -->
+    <div class="step-card">
+        <input type="checkbox" id="toggle-s4" class="step-toggle">
+        <label class="step-header" for="toggle-s4">4. Safe Driving Habits</label>
+        <div class="step-content">
+            <div class="checklist-item">
+                <span class="item-label">Wear seat belt properly</span>
+                <div class="segmented-control" data-item="s4-1">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s4-1', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s4-1', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Proper seating position</span>
+                <div class="segmented-control" data-item="s4-2">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s4-2', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s4-2', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Limits distractions</span>
+                <div class="segmented-control" data-item="s4-3">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s4-3', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s4-3', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Courteous and patient</span>
+                <div class="segmented-control" data-item="s4-4">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s4-4', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s4-4', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Obeys traffic signs and regulations</span>
+                <div class="segmented-control" data-item="s4-5">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s4-5', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s4-5', 'no')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 5 -->
+    <div class="step-card">
+        <input type="checkbox" id="toggle-s5" class="step-toggle">
+        <label class="step-header" for="toggle-s5">5. CMV Controls & Operation</label>
+        <div class="step-content">
+            <div class="checklist-item">
+                <span class="item-label">Place transmission in neutral prior to start</span>
+                <div class="segmented-control" data-item="s5-1">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s5-1', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s5-1', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">No difficulty starting engine and warming up</span>
+                <div class="segmented-control" data-item="s5-2">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s5-2', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s5-2', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Monitors instrument panel for warnings</span>
+                <div class="segmented-control" data-item="s5-3">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s5-3', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s5-3', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Place commercial motor vehicle in operation</span>
+                <div class="segmented-control" data-item="s5-4">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s5-4', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s5-4', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Keeps both hands on the wheel</span>
+                <div class="segmented-control" data-item="s5-5">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s5-5', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s5-5', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Operates in a safe position on the road</span>
+                <div class="segmented-control" data-item="s5-6">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s5-6', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s5-6', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Continuously check mirrors</span>
+                <div class="segmented-control" data-item="s5-7">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s5-7', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s5-7', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Constant scan of surroundings</span>
+                <div class="segmented-control" data-item="s5-8">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s5-8', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s5-8', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Maintains proper distance</span>
+                <div class="segmented-control" data-item="s5-9">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s5-9', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s5-9', 'no')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 6 -->
+    <div class="step-card">
+        <input type="checkbox" id="toggle-s6" class="step-toggle">
+        <label class="step-header" for="toggle-s6">6. Intersections</label>
+        <div class="step-content">
+            <div class="checklist-item">
+                <span class="item-label">Cautions - be prepared to stop</span>
+                <div class="segmented-control" data-item="s6-1">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s6-1', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s6-1', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Stop clear of crosswalks</span>
+                <div class="segmented-control" data-item="s6-2">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s6-2', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s6-2', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Complete stop at stop signs and red lights</span>
+                <div class="segmented-control" data-item="s6-3">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s6-3', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s6-3', 'no')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 7 -->
+    <div class="step-card">
+        <input type="checkbox" id="toggle-s7" class="step-toggle">
+        <label class="step-header" for="toggle-s7">7. Speed</label>
+        <div class="step-content">
+            <div class="checklist-item">
+                <span class="item-label">Smooth acceleration</span>
+                <div class="segmented-control" data-item="s7-1">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s7-1', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s7-1', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Drives within the minimum & posted speed limits</span>
+                <div class="segmented-control" data-item="s7-2">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s7-2', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s7-2', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Adjusts to traffic, weather, road conditions</span>
+                <div class="segmented-control" data-item="s7-3">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s7-3', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s7-3', 'no')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 8 -->
+    <div class="step-card">
+        <input type="checkbox" id="toggle-s8" class="step-toggle">
+        <label class="step-header" for="toggle-s8">8. Braking and Slowing</label>
+        <div class="step-content">
+            <div class="checklist-item">
+                <span class="item-label">Applies brakes smoothly</span>
+                <div class="segmented-control" data-item="s8-1">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s8-1', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s8-1', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Does not overuse the brakes</span>
+                <div class="segmented-control" data-item="s8-2">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s8-2', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s8-2', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Test brakes ahead of congestion or decline</span>
+                <div class="segmented-control" data-item="s8-3">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s8-3', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s8-3', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Braking & slowing CMV by means other than service brakes</span>
+                <div class="segmented-control" data-item="s8-4">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s8-4', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s8-4', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Understands when and how to downshift</span>
+                <div class="segmented-control" data-item="s8-5">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s8-5', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s8-5', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Understands when and how to operate engine brake</span>
+                <div class="segmented-control" data-item="s8-6">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s8-6', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s8-6', 'no')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 9 -->
+    <div class="step-card">
+        <input type="checkbox" id="toggle-s9" class="step-toggle">
+        <label class="step-header" for="toggle-s9">9. Passing and Lane Change</label>
+        <div class="step-content">
+            <div class="checklist-item">
+                <span class="item-label">Signals before lane change</span>
+                <div class="segmented-control" data-item="s9-1">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s9-1', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s9-1', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Adequate space around vehicle</span>
+                <div class="segmented-control" data-item="s9-2">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s9-2', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s9-2', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Uses proper lane for passing</span>
+                <div class="segmented-control" data-item="s9-3">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s9-3', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s9-3', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Timely execution of lane change</span>
+                <div class="segmented-control" data-item="s9-4">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s9-4', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s9-4', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Does NOT pass on curves or hills</span>
+                <div class="segmented-control" data-item="s9-5">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s9-5', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s9-5', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Caution with objects on shoulder</span>
+                <div class="segmented-control" data-item="s9-6">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s9-6', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s9-6', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Moves over/slows down for emergency vehicles, construction, pedestrians</span>
+                <div class="segmented-control" data-item="s9-7">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s9-7', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s9-7', 'no')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 10 -->
+    <div class="step-card">
+        <input type="checkbox" id="toggle-s10" class="step-toggle">
+        <label class="step-header" for="toggle-s10">10. Turning</label>
+        <div class="step-content">
+            <div class="checklist-item">
+                <span class="item-label">Tail swings accommodation</span>
+                <div class="segmented-control" data-item="s10-1">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s10-1', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s10-1', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Does not over/under steer</span>
+                <div class="segmented-control" data-item="s10-2">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s10-2', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s10-2', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Monitors both mirrors</span>
+                <div class="segmented-control" data-item="s10-3">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s10-3', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s10-3', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Checks blind spots</span>
+                <div class="segmented-control" data-item="s10-4">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s10-4', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s10-4', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Avoids contacting curbs</span>
+                <div class="segmented-control" data-item="s10-5">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s10-5', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s10-5', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Ensures 360 degree clearance</span>
+                <div class="segmented-control" data-item="s10-6">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s10-6', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s10-6', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Takes the proper lane for turns</span>
+                <div class="segmented-control" data-item="s10-7">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s10-7', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s10-7', 'no')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 11 -->
+    <div class="step-card">
+        <input type="checkbox" id="toggle-s11" class="step-toggle">
+        <label class="step-header" for="toggle-s11">11. Backing and Parking</label>
+        <div class="step-content">
+            <div class="checklist-item">
+                <span class="item-label">Checks before backing</span>
+                <div class="segmented-control" data-item="s11-1">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s11-1', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s11-1', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Air horn - warns others</span>
+                <div class="segmented-control" data-item="s11-2">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s11-2', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s11-2', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Uses 4-way flashers</span>
+                <div class="segmented-control" data-item="s11-3">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s11-3', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s11-3', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Uses mirrors and cameras (if applicable)</span>
+                <div class="segmented-control" data-item="s11-4">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s11-4', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s11-4', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Maintains a slow and steady speed</span>
+                <div class="segmented-control" data-item="s11-5">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s11-5', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s11-5', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Does not over/under steer</span>
+                <div class="segmented-control" data-item="s11-6">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s11-6', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s11-6', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Avoids unnecessary backing</span>
+                <div class="segmented-control" data-item="s11-7">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s11-7', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s11-7', 'no')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 12 -->
+    <div class="step-card">
+        <input type="checkbox" id="toggle-s12" class="step-toggle">
+        <label class="step-header" for="toggle-s12">12. Loading / Unloading / Securement</label>
+        <div class="step-content">
+            <div class="checklist-item">
+                <span class="item-label">Uses proper lighting (strobe, 4-way flashers)</span>
+                <div class="segmented-control" data-item="s12-1">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s12-1', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s12-1', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Clear of overhead obstructions</span>
+                <div class="segmented-control" data-item="s12-2">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s12-2', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s12-2', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Chocks wheels</span>
+                <div class="segmented-control" data-item="s12-3">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s12-3', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s12-3', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Load placement- height, weight, position</span>
+                <div class="segmented-control" data-item="s12-4">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s12-4', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s12-4', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Four points of securement per vehicle</span>
+                <div class="segmented-control" data-item="s12-5">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s12-5', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s12-5', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Operates and pins hydraulics safely</span>
+                <div class="segmented-control" data-item="s12-6">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s12-6', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s12-6', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Knows how to operate winch</span>
+                <div class="segmented-control" data-item="s12-7">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s12-7', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s12-7', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Double checks load before departure</span>
+                <div class="segmented-control" data-item="s12-8">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s12-8', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s12-8', 'no')">No</button>
+                </div>
+            </div>
+            <div class="checklist-item">
+                <span class="item-label">Safely Loads/Unloads vehicles</span>
+                <div class="segmented-control" data-item="s12-9">
+                    <button class="seg-btn yes-toggle" onclick="toggleItem('s12-9', 'yes')">Yes</button>
+                    <button class="seg-btn no-toggle" onclick="toggleItem('s12-9', 'no')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remarks -->
+    <div class="info-card">
+        <h2>Remarks & Sign-off Certification</h2>
+        <div class="input-group" style="margin-bottom:15px;">
+            <label for="remarks">Remarks / Observations</label>
+            <textarea id="remarks" rows="4" placeholder="Enter examiner notes here..."></textarea>
+        </div>
+        
+        <div class="grid-inputs" style="margin-bottom:15px;">
+            <div class="input-group">
+                <label for="powerUnit">Type of Power Unit</label>
+                <input type="text" id="powerUnit" placeholder="e.g. Rollback">
+            </div>
+            <div class="input-group">
+                <label for="trailerType">Type of Trailer</label>
+                <input type="text" id="trailerType" placeholder="e.g. Cottrell">
+            </div>
+            <div class="input-group">
+                <label for="passengerCarrier">Passenger Carrier Bus Type (if app.)</label>
+                <input type="text" id="passengerCarrier" placeholder="N/A" value="N/A">
+            </div>
+        </div>
+
+        <div class="cert-text">
+            This is to certify that the above-named driver was given a road test under my supervision consisting of approximately <input type="number" id="testMiles" style="width:70px; display:inline-block; height:30px; padding:4px;" placeholder="Miles"> miles of driving and <input type="number" id="testHours" style="width:60px; display:inline-block; height:30px; padding:4px;" placeholder="Hours"> hours of observing. It is my considered opinion that this driver possesses sufficient driving skills to safely operate the type of commercial motor vehicle/s listed above.
+        </div>
+
+        <div class="grid-inputs" style="margin-bottom:15px;">
+            <div class="input-group">
+                <label for="examinerName">Examiner Printed Name</label>
+                <input type="text" id="examinerName" placeholder="Examiner Name">
+            </div>
+            <div class="input-group">
+                <label for="examinerTitle">Title</label>
+                <input type="text" id="examinerTitle" placeholder="Examiner Title">
+            </div>
+            <div class="input-group">
+                <label for="organizationName">Organization Name</label>
+                <input type="text" id="organizationName" placeholder="CarMax">
+            </div>
+        </div>
+
+        <div class="input-group" style="margin-bottom:15px;">
+            <label for="storeAddress">Store Address (Street, City, State, Zip)</label>
+            <input type="text" id="storeAddress" placeholder="Enter Store Address">
+        </div>
+
+        <!-- Examiner Signature Canvas -->
+        <div class="signature-area">
+            <label style="font-weight: 600; font-size: 11px; color: var(--secondary-text); text-transform: uppercase; display: block; margin-bottom: 5px;">Examiner Signature</label>
+            <div class="canvas-container">
+                <canvas id="sigCanvas" class="signature-canvas"></canvas>
+                <button type="button" class="canvas-clear-btn" onclick="clearSignature()">Clear</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Sticky Footer -->
+<div class="footer-actions">
+    <button type="button" class="btn btn-secondary" onclick="openHistoryModal()">History</button>
+    <button type="button" class="btn btn-secondary" onclick="confirmReset()">Clear</button>
+    <button type="button" class="btn btn-secondary" onclick="window.print()">Print PDF</button>
+    <button type="button" class="btn btn-primary" onclick="submitInspection()">Submit</button>
+</div>
+
+<!-- History Modal -->
+<div class="modal-overlay" id="historyModal">
+    <div class="modal-box">
+        <div class="modal-title">Inspection History</div>
+        <div class="history-list" id="historyList">
+            <!-- Dynamically populated -->
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn btn-secondary" onclick="closeHistoryModal()">Close</button>
+            <button type="button" class="btn btn-secondary" style="background:#ff3b30; color:white;" onclick="clearHistory()">Delete All</button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Reset Modal -->
+<div class="modal-overlay" id="confirmResetModal">
+    <div class="modal-box">
+        <div class="modal-title" style="color:var(--danger-color)">Clear Checklist?</div>
+        <div class="modal-message">This will completely reset the active checklist and driver information. This action cannot be undone.</div>
+        <div class="modal-buttons">
+            <button type="button" class="btn btn-secondary" onclick="closeResetModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" style="background:var(--danger-color)" onclick="resetChecklist()">Yes, Clear</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // State layout
+    let appState = {
+        driverName: '',
+        employeeId: '',
+        testDate: '',
+        powerUnit: '',
+        trailerType: '',
+        passengerCarrier: 'N/A',
+        examinerName: '',
+        examinerTitle: '',
+        organizationName: '',
+        storeAddress: '',
+        remarks: '',
+        testMiles: '',
+        testHours: '',
+        checks: {}, // key: val ("yes", "no")
+        signatureData: '' // DataURI
+    };
+
+    const totalChecks = 63;
+
+    // Signature Canvas setup
+    const canvas = document.getElementById('sigCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    function resizeCanvas() {
+        // Fix scaling for retina/high-dpi displays
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        if (appState.signatureData) {
+            const img = new Image();
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+            };
+            img.src = appState.signatureData;
+        }
+    }
+
+    // Touch & Mouse bindings for Canvas
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        if (e.touches && e.touches.length > 0) {
+            return {
+                x: e.touches[0].clientX - rect.left,
+                y: e.touches[0].clientY - rect.top
+            };
+        }
+        return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+    }
+
+    function startDraw(e) {
+        isDrawing = true;
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+        e.preventDefault();
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        const pos = getPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        e.preventDefault();
+    }
+
+    function endDraw() {
+        if (!isDrawing) return;
+        isDrawing = false;
+        appState.signatureData = canvas.toDataURL();
+        saveDraft();
+    }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    window.addEventListener('mouseup', endDraw);
+
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', draw, { passive: false });
+    canvas.addEventListener('touchend', endDraw);
+
+    function clearSignature() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        appState.signatureData = '';
+        saveDraft();
+    }
+
+    // Toggle logic for Yes/No buttons
+    function toggleItem(itemId, value) {
+        const container = document.querySelector(`[data-item="${itemId}"]`);
+        const yesBtn = container.querySelector('.yes-toggle');
+        const noBtn = container.querySelector('.no-toggle');
+
+        if (appState.checks[itemId] === value) {
+            // Clicked already selected option -> toggle/clear it
+            appState.checks[itemId] = null;
+            yesBtn.classList.remove('active-yes');
+            noBtn.classList.remove('active-no');
+        } else {
+            appState.checks[itemId] = value;
+            if (value === 'yes') {
+                yesBtn.classList.add('active-yes');
+                noBtn.classList.remove('active-no');
+            } else {
+                yesBtn.classList.remove('active-yes');
+                noBtn.classList.add('active-no');
+            }
+        }
+        updateProgress();
+        saveDraft();
+    }
+
+    function updateProgress() {
+        let completed = 0;
+        for (let key in appState.checks) {
+            if (appState.checks[key] === 'yes' || appState.checks[key] === 'no') {
+                completed++;
+            }
+        }
+        const percent = totalChecks > 0 ? Math.round((completed / totalChecks) * 100) : 0;
+        document.getElementById('progressBar').style.width = `${percent}%`;
+        document.getElementById('progressText').innerText = `${completed} / ${totalChecks} completed (${percent}%)`;
+    }
+
+    // Draft Autosave & Restore
+    function saveDraft() {
+        // Gather text inputs
+        appState.driverName = document.getElementById('driverName').value;
+        appState.employeeId = document.getElementById('employeeId').value;
+        appState.testDate = document.getElementById('testDate').value;
+        appState.powerUnit = document.getElementById('powerUnit').value;
+        appState.trailerType = document.getElementById('trailerType').value;
+        appState.passengerCarrier = document.getElementById('passengerCarrier').value;
+        appState.examinerName = document.getElementById('examinerName').value;
+        appState.examinerTitle = document.getElementById('examinerTitle').value;
+        appState.organizationName = document.getElementById('organizationName').value;
+        appState.storeAddress = document.getElementById('storeAddress').value;
+        appState.remarks = document.getElementById('remarks').value;
+        appState.testMiles = document.getElementById('testMiles').value;
+        appState.testHours = document.getElementById('testHours').value;
+        appState.timestamp = Date.now();
+
+        localStorage.setItem('roadTestData', JSON.stringify(appState));
+    }
+
+    function loadDraft() {
+        const saved = localStorage.getItem('roadTestData');
+        if (saved) {
+            const data = JSON.parse(saved);
+            // Expire after 7 days
+            if (data.timestamp && Date.now() - data.timestamp < 7 * 24 * 60 * 60 * 1000) {
+                appState = data;
+                
+                document.getElementById('driverName').value = appState.driverName || '';
+                document.getElementById('employeeId').value = appState.employeeId || '';
+                document.getElementById('testDate').value = appState.testDate || '';
+                document.getElementById('powerUnit').value = appState.powerUnit || '';
+                document.getElementById('trailerType').value = appState.trailerType || '';
+                document.getElementById('passengerCarrier').value = appState.passengerCarrier || 'N/A';
+                document.getElementById('examinerName').value = appState.examinerName || '';
+                document.getElementById('examinerTitle').value = appState.examinerTitle || '';
+                document.getElementById('organizationName').value = appState.organizationName || '';
+                document.getElementById('storeAddress').value = appState.storeAddress || '';
+                document.getElementById('remarks').value = appState.remarks || '';
+                document.getElementById('testMiles').value = appState.testMiles || '';
+                document.getElementById('testHours').value = appState.testHours || '';
+
+                // Restore toggles
+                if (appState.checks) {
+                    for (let itemId in appState.checks) {
+                        const val = appState.checks[itemId];
+                        const container = document.querySelector(`[data-item="${itemId}"]`);
+                        if (container) {
+                            const yesBtn = container.querySelector('.yes-toggle');
+                            const noBtn = container.querySelector('.no-toggle');
+                            if (val === 'yes') yesBtn.classList.add('active-yes');
+                            if (val === 'no') noBtn.classList.add('active-no');
+                        }
+                    }
+                }
+                updateProgress();
+            }
+        } else {
+            // Default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('testDate').value = today;
+            appState.testDate = today;
+        }
+    }
+
+    // Modal controllers
+    function confirmReset() {
+        document.getElementById('confirmResetModal').style.display = 'flex';
+    }
+
+    function closeResetModal() {
+        document.getElementById('confirmResetModal').style.display = 'none';
+    }
+
+    function resetChecklist() {
+        localStorage.removeItem('roadTestData');
+        appState = {
+            driverName: '',
+            employeeId: '',
+            testDate: new Date().toISOString().split('T')[0],
+            powerUnit: '',
+            trailerType: '',
+            passengerCarrier: 'N/A',
+            examinerName: '',
+            examinerTitle: '',
+            organizationName: '',
+            storeAddress: '',
+            remarks: '',
+            testMiles: '',
+            testHours: '',
+            checks: {},
+            signatureData: ''
+        };
+
+        // UI Reset
+        document.getElementById('driverName').value = '';
+        document.getElementById('employeeId').value = '';
+        document.getElementById('testDate').value = appState.testDate;
+        document.getElementById('powerUnit').value = '';
+        document.getElementById('trailerType').value = '';
+        document.getElementById('passengerCarrier').value = 'N/A';
+        document.getElementById('examinerName').value = '';
+        document.getElementById('examinerTitle').value = '';
+        document.getElementById('organizationName').value = '';
+        document.getElementById('storeAddress').value = '';
+        document.getElementById('remarks').value = '';
+        document.getElementById('testMiles').value = '';
+        document.getElementById('testHours').value = '';
+        clearSignature();
+
+        document.querySelectorAll('.seg-btn').forEach(btn => {
+            btn.classList.remove('active-yes', 'active-no');
+        });
+
+        updateProgress();
+        closeResetModal();
+    }
+
+    // History Manager
+    function openHistoryModal() {
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+        
+        let history = JSON.parse(localStorage.getItem('roadTestHistory') || '[]');
+        if (history.length === 0) {
+            historyList.innerHTML = '<div class="history-empty">No history found.</div>';
+        } else {
+            history.forEach((item, index) => {
+                const dateStr = new Date(item.timestamp).toLocaleString();
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="history-info">
+                        <strong>Driver: ${item.driverName || 'Unknown'}</strong>
+                        <span class="history-meta">Date: ${item.testDate || 'Unknown'}</span>
+                        <span class="history-meta">Passed: ${item.passed ? '✅ Yes' : '❌ No'}</span>
+                    </div>
+                    <button class="restore-btn" onclick="restoreHistoryItem(${index})">Load</button>
+                `;
+                historyList.appendChild(div);
+            });
+        }
+        document.getElementById('historyModal').style.display = 'flex';
+    }
+
+    function closeHistoryModal() {
+        document.getElementById('historyModal').style.display = 'none';
+    }
+
+    function restoreHistoryItem(index) {
+        let history = JSON.parse(localStorage.getItem('roadTestHistory') || '[]');
+        if (history[index]) {
+            appState = history[index];
+            localStorage.setItem('roadTestData', JSON.stringify(appState));
+            closeHistoryModal();
+            location.reload();
+        }
+    }
+
+    function clearHistory() {
+        if (confirm("Are you sure you want to delete all saved history?")) {
+            localStorage.removeItem('roadTestHistory');
+            openHistoryModal();
+        }
+    }
+
+    // Form Submit
+    function submitInspection() {
+        saveDraft();
+        let unanswered = 0;
+        let anyNo = false;
+
+        // Check if all 64 options are answered
+        const categories = [
+            's1-1', 's2-1','s2-2','s2-3','s3-1','s3-2','s3-3','s4-1','s4-2','s4-3','s4-4','s4-5',
+            's5-1','s5-2','s5-3','s5-4','s5-5','s5-6','s5-7','s5-8','s5-9','s6-1','s6-2','s6-3',
+            's7-1','s7-2','s7-3','s8-1','s8-2','s8-3','s8-4','s8-5','s8-6','s9-1','s9-2','s9-3',
+            's9-4','s9-5','s9-6','s9-7','s10-1','s10-2','s10-3','s10-4','s10-5','s10-6','s10-7',
+            's11-1','s11-2','s11-3','s11-4','s11-5','s11-6','s11-7','s12-1','s12-2','s12-3','s12-4',
+            's12-5','s12-6','s12-7','s12-8','s12-9'
+        ];
+
+        categories.forEach(id => {
+            if (!appState.checks[id]) {
+                unanswered++;
+            } else if (appState.checks[id] === 'no') {
+                anyNo = true;
+            }
+        });
+
+        if (unanswered > 0) {
+            alert(`Please complete the checklist. There are ${unanswered} questions left.`);
+            return;
+        }
+
+        if (!appState.driverName || !appState.examinerName || !appState.signatureData) {
+            alert("Please fill in the Driver Name, Examiner Name, and sign the form before submitting.");
+            return;
+        }
+
+        const passed = !anyNo;
+        appState.passed = passed;
+
+        // Append to history
+        let history = JSON.parse(localStorage.getItem('roadTestHistory') || '[]');
+        history.unshift(appState);
+        // limit history to 50 items
+        if (history.length > 50) history.pop();
+        localStorage.setItem('roadTestHistory', JSON.stringify(history));
+
+        alert(passed 
+            ? "Road Test Completed Successfully! The driver has PASSED."
+            : "Road Test Completed. The driver has NON-PROFICIENT rating items (FAILED). Follow up with training."
+        );
+    }
+
+    // Init load bindings
+    window.onload = function() {
+        loadDraft();
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Setup text bindings to save draft immediately on change
+        const inputs = document.querySelectorAll('.grid-inputs input, .grid-inputs textarea, #remarks');
+        inputs.forEach(input => {
+            input.addEventListener('input', saveDraft);
+        });
+    };
+
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('Service Worker Registered'))
+            .catch((err) => console.log('Service Worker Failed to Register', err));
+    }
+</script>
+</body>
+</html>
