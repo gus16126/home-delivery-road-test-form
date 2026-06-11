@@ -75,3 +75,15 @@ Stores up to 50 previous completed inspections.
   }
 ]
 ```
+
+---
+
+## 📜 Changelog & Project Milestones
+* **2026-06-11 (v12 - v18):**
+  - **Offline PWA Core Setup:** Initialized Service Worker (`sw.js`), Manifest (`manifest.json`), and custom Steering Wheel icon (`icon.svg`) for the Home Delivery/Rollback Road Test form.
+  - **Dynamic Save & Restoration:** Implemented draft saving, progress tracking, canvas signature drawing, history storage, and print styles.
+  - **Side-by-Side Row 1 Layout:** Placed Driver's Name and Employee ID side-by-side with vertical labels.
+  - **Inline Row 2 Date Layout:** Positioned the Date field on Row 2 with a horizontal "Date:" label to the left of the input box.
+  - **Date Sizing & Safari Fix:** Configured Date field height to match Driver's Name input exactly (`40px`) and applied `-webkit-appearance: none` to prevent Safari styling defaults from breaking layouts.
+  - **Employee ID Box Optimization:** Rescaled the grid flex columns from `2:1` to `3:1`. This widened the Driver/Date columns and reduced the Employee ID column by 25%, resolving right-side screen overflows.
+  - **HTTP Cache Bypass:** Configured service worker fetch mechanism to request same-origin resources with `cache: 'reload'`, forcing Safari to bypass browser HTTP caches and immediately download newly deployed updates.
