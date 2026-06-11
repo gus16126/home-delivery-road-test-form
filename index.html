@@ -85,10 +85,46 @@
         }
 
         .grid-inputs {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 12px;
             margin-bottom: 12px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .flex-2 {
+            flex: 2;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        .date-horizontal-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-horizontal-group label {
+            font-weight: 600;
+            font-size: 11px;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-bottom: 0;
+        }
+
+        .date-horizontal-group input {
+            flex: 1;
+            width: 100%;
         }
 
         .input-group {
@@ -560,17 +596,26 @@
     <div class="instructions">Use the Yes / No toggle for each item. All items must have a 'Yes' rating for the driver to pass the road test.</div>
     
     <div class="grid-inputs">
-        <div class="input-group">
-            <label for="driverName">Driver's Name</label>
-            <input type="text" id="driverName" placeholder="Driver Name">
+        <!-- Row 1: Driver's Name and Employee ID Side-by-Side (labels on top) -->
+        <div class="input-row">
+            <div class="input-group flex-2">
+                <label for="driverName">Driver's Name</label>
+                <input type="text" id="driverName" placeholder="Driver Name">
+            </div>
+            <div class="input-group flex-1">
+                <label for="employeeId">Employee ID#</label>
+                <input type="text" id="employeeId" placeholder="Employee ID">
+            </div>
         </div>
-        <div class="input-group">
-            <label for="employeeId">Employee ID#</label>
-            <input type="text" id="employeeId" placeholder="Employee ID">
-        </div>
-        <div class="input-group">
-            <label for="testDate">Date</label>
-            <input type="date" id="testDate">
+        
+        <!-- Row 2: Date Field (label in front, input box matched to Driver Name width exactly) -->
+        <div class="input-row" style="align-items: center;">
+            <div class="date-horizontal-group flex-2">
+                <label for="testDate">Date:</label>
+                <input type="date" id="testDate">
+            </div>
+            <!-- Blank spacer to align exactly with Employee ID column -->
+            <div class="flex-1"></div>
         </div>
     </div>
     
@@ -1578,7 +1623,7 @@
 
     // Service Worker Registration
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js?v=11')
+        navigator.serviceWorker.register('./sw.js?v=12')
             .then(() => console.log('Service Worker Registered'))
             .catch((err) => console.log('Service Worker Failed to Register', err));
             
