@@ -1,4 +1,4 @@
-const CACHE_NAME = 'road-test-cache-v16';
+const CACHE_NAME = 'road-test-cache-v17';
 const ASSETS = [
   './',
   './index.html',
@@ -36,8 +36,11 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
 
+  const isSameOrigin = e.request.url.startsWith(self.location.origin);
+  const requestToFetch = isSameOrigin ? new Request(e.request, { cache: 'reload' }) : e.request;
+
   e.respondWith(
-    fetch(e.request).then((networkResponse) => {
+    fetch(requestToFetch).then((networkResponse) => {
       // If network returns a valid file, update the cache and serve it
       if (networkResponse.status === 200) {
         return caches.open(CACHE_NAME).then((cache) => {
