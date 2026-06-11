@@ -93,31 +93,37 @@
 
         .driver-name-group {
             grid-column: 1;
+            grid-row: 1;
         }
 
         .employee-id-group {
             grid-column: 2;
+            grid-row: 1;
         }
 
         .test-date-group {
-            grid-column: 2;
+            grid-column: 1;
+            grid-row: 2;
         }
 
-        .input-group {
+        .input-group-horizontal {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
 
-        .input-group label {
+        .input-group-horizontal label {
             font-weight: 600;
             font-size: 11px;
-            margin-bottom: 4px;
             color: var(--secondary-text);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            width: 100px;
+            flex-shrink: 0;
+            white-space: nowrap;
         }
 
-        .input-group input {
+        .input-group-horizontal input, .input-group input {
             padding: 6px 12px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -581,15 +587,15 @@
     <div class="instructions">Use the Yes / No toggle for each item. All items must have a 'Yes' rating for the driver to pass the road test.</div>
     
     <div class="grid-inputs">
-        <div class="input-group driver-name-group">
+        <div class="input-group-horizontal driver-name-group">
             <label for="driverName">Driver's Name</label>
             <input type="text" id="driverName" placeholder="Driver Name">
         </div>
-        <div class="input-group employee-id-group">
+        <div class="input-group-horizontal employee-id-group">
             <label for="employeeId">Employee ID#</label>
             <input type="text" id="employeeId" placeholder="Employee ID">
         </div>
-        <div class="input-group test-date-group">
+        <div class="input-group-horizontal test-date-group">
             <label for="testDate">Date</label>
             <input type="date" id="testDate">
         </div>
@@ -1599,7 +1605,7 @@
 
     // Service Worker Registration
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js?v=8')
+        navigator.serviceWorker.register('./sw.js?v=9')
             .then(() => console.log('Service Worker Registered'))
             .catch((err) => console.log('Service Worker Failed to Register', err));
             
