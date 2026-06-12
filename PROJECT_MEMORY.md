@@ -8,6 +8,7 @@
 - **Use Case**: A mobile-friendly inspection and testing guide for Home Delivery and Rollback road tests.
 - **Core Requirement**: The app **must run completely offline** with zero cell signal (e.g. at highway shoulders, weigh stations, or remote dealership lots).
 - **Hosting URL**: `https://gus16126.github.io/home-delivery-road-test-form/`
+- **Workspace Path**: `C:\Users\trans\.gemini\antigravity\scratch\Home Delivery Road Test Form`
 
 ---
 
